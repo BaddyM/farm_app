@@ -52,7 +52,7 @@ class UserLogin extends StatelessWidget {
             Expanded(
               child: Container(
                 decoration: const BoxDecoration(
-                    color: Colors.white,
+                    color: Colors.yellow,
                     borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(40.0),
                         topRight: Radius.circular(40.0)),
@@ -75,12 +75,12 @@ class UserLogin extends StatelessWidget {
                           width: 70,
                           textStyle: TextStyle(fontSize: 20),
                           decoration: BoxDecoration(
-                              color: Colors.yellow,
+                              color: Colors.white,
                               boxShadow: [
                                 BoxShadow(
-                                    color: Colors.yellow,
+                                    color: Colors.grey,
                                     offset: Offset.zero,
-                                    blurRadius: 10,
+                                    blurRadius: 6,
                                     spreadRadius: 1)
                               ],
                               borderRadius:
@@ -89,7 +89,7 @@ class UserLogin extends StatelessWidget {
                         obscuringCharacter: "*",
                         onCompleted: (values) {},
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
                       GestureDetector(

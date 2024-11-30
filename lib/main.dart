@@ -1,8 +1,11 @@
+import 'package:farm_app/screens/home.dart';
 import 'package:flutter/material.dart';
 import 'package:farm_app/screens/login.dart';
+import 'package:farm_app/screens/register.dart';
+import 'package:flutter/services.dart';
 
 void main() {
-  runApp(const MyApp());
+    runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -12,6 +15,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var title = "My Farm";
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title:title,
@@ -20,7 +27,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.lightGreenAccent,
         useMaterial3: true,
       ),
-      home: UserLogin(title: title,),
+      home: FarmHome(title: title,),
     );
   }
 }
