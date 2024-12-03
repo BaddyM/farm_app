@@ -15,16 +15,18 @@ class FarmTextInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 10.0),
+      margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
+        cursorColor: Colors.white,
         decoration: InputDecoration(
+          labelStyle: const TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
             labelText: inputLabel,
             enabledBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.green, width: 1.0)),
+                borderSide: BorderSide(color: Colors.white, width: 1.0)),
             focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.green, width: 3.0))),
+                borderSide: BorderSide(color: Colors.white, width: 3.0))),
       ),
     );
   }

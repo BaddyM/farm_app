@@ -3,8 +3,9 @@ import "package:farm_app/components/drawer.dart";
 import "package:flutter/material.dart";
 
 class FarmHome extends StatefulWidget {
-  const FarmHome({super.key, this.title});
+  const FarmHome({super.key, this.title, this.version});
   final title;
+  final version;
 
   @override
   State<FarmHome> createState() => _FarmHomeState();
@@ -15,7 +16,7 @@ class _FarmHomeState extends State<FarmHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: FarmAppBar(title: widget.title,),
-      drawer: FarmDrawer(),
+      drawer: FarmDrawer(title: widget.title,version: widget.version,),
     );
   }
 }
