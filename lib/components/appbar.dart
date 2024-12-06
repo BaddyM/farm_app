@@ -1,3 +1,4 @@
+import 'package:farm_app/screens/profile.dart';
 import 'package:flutter/material.dart';
 
 class FarmAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -24,7 +25,9 @@ class FarmAppBar extends StatelessWidget implements PreferredSizeWidget {
         fontSize: 35),
       ),
       actions: [
-        IconButton(onPressed: (){},
+        IconButton(onPressed: (){
+          Navigator.pushNamed(context,"userProfile");
+        },
             icon: const Icon(Icons.person_rounded,color: Colors.white,))
       ],
     );

@@ -17,6 +17,14 @@ class FarmDrawer extends StatelessWidget {
       "3671721_calendar_icon.png",
       "2849830_multimedia_options_setting_settings_gear_icon.png"
     ];
+    var routes = [
+      "chicks",
+      "flock",
+      "chicks",
+      "chicks",
+      "chicks",
+      "chicks",
+    ];
 
     return SafeArea(
       child: Drawer(
@@ -46,7 +54,7 @@ class FarmDrawer extends StatelessWidget {
               for(int i=0; i<labels.length; i++)
               GestureDetector(
                 onTap: (){
-          
+                    Navigator.pushNamed(context, routes[i]);
                 },
                 child: DrawerItem(image: images[i],label: labels[i],),
               ),
