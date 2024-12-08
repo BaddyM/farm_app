@@ -15,6 +15,7 @@ class DatabaseService {
   final String _appInfo = "app_info";
   final String _userInfo = "user_info";
   final String _flockInfo = "flock_info";
+  final String _salesHistoryTable = "sales_history_table";
 
   //Check if the database exists or not
   Future<Database> get database async {
@@ -50,6 +51,13 @@ class DatabaseService {
           uploaded INTEGER NOT NULL DEFAULT 0)
         ''';
 
+        final String createSalesHistoryTable = '''
+          CREATE TABLE IF NOT EXISTS $_salesHistoryTable(id INTEGER PRIMARY KEY AUTOINCREMENT, flock TEXT NOT NULL,
+          qty INTEGER NOT NULL, weight REAL NOT NULL, decimal_value REAL NOT NULL, price INTEGER NOT NULL, 
+          date TEXT NOT NULL,on_credit INTEGER NOT NULL DEFAULT 0, paid INTEGER NOT NULL DEFAULT 0, customer_name TEXT,
+          uploaded INTEGER NOT NULL DEFAULT 0)
+        ''';
+
         final String createAppInfoTable = '''
           CREATE TABLE IF NOT EXISTS $_appInfo(id INTEGER PRIMARY KEY AUTOINCREMENT,app_version INTEGER NOT NULL DEFAULT 0,
           app_name TEXT NOT NULL)
@@ -62,7 +70,7 @@ class DatabaseService {
 
         final String createFlockInfoTable = '''
           CREATE TABLE IF NOT EXISTS $_flockInfo(id INTEGER PRIMARY KEY AUTOINCREMENT, flock TEXT NOT NULL,
-          active INTEGER NOT NULL DEFAULT 1)
+          active INTEGER NOT NULL DEFAULT 0)
         ''';
 
         //Create the tables here
@@ -72,15 +80,17 @@ class DatabaseService {
         db.execute(createAppInfoTable);
         db.execute(createSalesTable);
         db.execute(createFlockInfoTable);
+        db.execute(createSalesHistoryTable);
       },
     );
     return database;
   }
 
   //DB table functions
-  void addChicksData(String company, int? deaths, int? qty, int? available,
-      String date) async {
+  void addChicksData(String company, int deaths, int qty) async {
     final db = await database;
+    final date = "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}";
+    final available = (qty - deaths);
     await db.insert(_chicksTable, {
       "deaths": deaths,
       "company": company,
@@ -91,7 +101,7 @@ class DatabaseService {
   }
 
   //Add Sales Data
-  void addSalesData(
+  Future<String> addSalesData(
       String flock,
       int? qty,
       double? weight,
@@ -102,6 +112,9 @@ class DatabaseService {
       String customerName,
       String date) async {
     final db = await database;
+    final currentFlockValue = await db.query(_flockTable,whereArgs: [flock],where: "flock=?");
+    print("Current Flock Qty: ${currentFlockValue}");
+    /*
     await db.insert(_salesTable, {
       "flock": flock,
       "weight": weight,
@@ -113,9 +126,11 @@ class DatabaseService {
       "qty": qty,
       "date": date
     });
+    */
+    return "";
   }
 
-  //Add to flock
+  //Flock Data
   void addFlockLabels(
     String flock,
   ) async {
@@ -123,10 +138,45 @@ class DatabaseService {
     await db.insert(_flockInfo, {"flock": flock});
   }
 
+  Future<List> getFlockLabels() async{
+    final db = await database;
+    var data = await db.rawQuery("SELECT * FROM flock_info ORDER BY id DESC;");
+    return data;
+  }
+
+  void deleteFlockLabel(int id) async{
+    final db = await database;
+    await db.delete("flock_info",where: "id=?",whereArgs: [id]);
+  }
+
+  void updateFlockLabel(int id) async{
+    final db = await database;
+    await db.update("flock_info", {
+      "active":0
+    },
+      where: "id!=?",
+      whereArgs: [id]
+    );
+    await db.update("flock_info", {
+      "active":1
+    },
+      where: "id=?",
+      whereArgs: [id]
+    );
+  }
+
+  Future<List> getFlockData() async{
+    final db = await database;
+    var data = await db.query(_flockTable,orderBy: "id DESC",);
+    return data;
+  }
+
   //Add to chicken flock
   void addChickenFlock(
-      String flock, int? qty, int? deaths, int? available, String date) async {
+      String flock, int qty, int deaths,) async {
     final db = await database;
+    final available = (qty - deaths);
+    String date = "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}";
     await db.insert(_flockTable, {
       "flock": flock,
       "qty": qty,
@@ -134,6 +184,24 @@ class DatabaseService {
       "available": available,
       "date": date
     });
+  }
+
+  //Delete flock
+  void deleteFlock(int? id) async{
+    final db = await database;
+    await db.delete(_flockTable,where: "id=?",whereArgs: [id]);
+  }
+
+  void updateFlock(int id, int flock, int qty, int deaths,) async{
+    final db = await database;
+    await db.update(_flockTable, {
+      "flock":flock,
+      "qty":qty,
+      "deaths":deaths
+    },
+      where: "id=?",
+      whereArgs: [id]
+    );
   }
 
   //User Profile
@@ -162,7 +230,7 @@ class DatabaseService {
         "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}";
 
     var salesData = await db.rawQuery('''
-      SELECT SUM(paid) as today_sales FROM chicken_sales WHERE date = "${today}";
+      SELECT SUM(paid) as today_sales FROM chicken_sales WHERE date = "$today";
     ''');
     var totalChicken = await db.rawQuery('''
       SELECT SUM(available) as available FROM chicken_flock;
@@ -188,6 +256,51 @@ class DatabaseService {
   Future<List> getChicksData() async{
     final db = await database;
     var data = await db.rawQuery("SELECT * FROM chicks_entry_stock ORDER BY id DESC;");
+    return data;
+  }
+
+  Future<String> transferFromBrooder(int id, int qty,int flock) async{
+    final db = await database;
+    //Check if flock exists in table
+    final flockExists = await db.query(_flockTable,where: "flock=?",whereArgs: [flock]);
+    if(flockExists.isNotEmpty){
+      //Update the flock table
+      String oldQty = "${flockExists[0]["qty"]}";
+      int newQty = (int.parse(oldQty) + qty);
+      await db.update(_flockTable,
+        {
+          "qty":newQty,
+        },
+        where: "flock=?",
+        whereArgs: [flock]
+      );
+    }else{
+      //Insert new flock
+      final String date = "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}";
+      await db.insert(_flockTable,
+        {
+          "qty":qty,
+         "flock":flock,
+         "available":qty,
+          "date":date
+        }
+      );
+    }
+
+    //Update the brooder table
+    await db.update(_chicksTable,
+    {
+      "brooder":0
+    },
+      whereArgs: [id],
+      where: "id=?"
+    );
+    return "";
+  }
+
+  Future<List> getActiveBrooderData() async{
+    final db = await database;
+    var data = await db.rawQuery("SELECT * FROM chicks_entry_stock WHERE brooder=1 ORDER BY id DESC;");
     return data;
   }
 

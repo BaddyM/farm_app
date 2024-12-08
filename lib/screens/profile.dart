@@ -1,11 +1,10 @@
-import "dart:convert";
-
 import "package:farm_app/components/InputFields.dart";
 import "package:farm_app/components/farm_button.dart";
 import "package:farm_app/models/database_service.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import 'package:pinput/pinput.dart';
+import 'package:go_router/go_router.dart';
 
 class UserProfile extends StatefulWidget {
   const UserProfile({super.key});
@@ -32,7 +31,7 @@ class _UserProfileState extends State<UserProfile> {
         elevation: 5.0,
         leading: IconButton(
             onPressed: () {
-              Navigator.of(context).pop();
+              context.go("/");
             },
             icon: const Icon(
               Icons.arrow_back,

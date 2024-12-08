@@ -6,17 +6,20 @@ class FarmTextInput extends StatelessWidget {
     required this.controller,
     required this.inputLabel,
     required this.keyboardType,
+    this.readOnly
   });
   
   final controller;
   final inputLabel;
   final keyboardType;
+  final readOnly;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
       child: TextFormField(
+        readOnly: readOnly==null?false:true,
         controller: controller,
         keyboardType: keyboardType,
         cursorColor: Colors.white,

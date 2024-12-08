@@ -1,5 +1,6 @@
-import 'package:farm_app/screens/profile.dart';
 import 'package:flutter/material.dart';
+import "package:go_router/go_router.dart";
+import "package:hugeicons/hugeicons.dart";
 
 class FarmAppBar extends StatelessWidget implements PreferredSizeWidget {
   const FarmAppBar({super.key, this.title});
@@ -15,7 +16,7 @@ class FarmAppBar extends StatelessWidget implements PreferredSizeWidget {
           onPressed: () {
             Scaffold.of(context).openDrawer();
           },
-          icon: Image.asset("assets/images/icons/2203529_app_block_menu_setting_tile_icon.png")),
+          icon: const HugeIcon(icon: HugeIcons.strokeRoundedDashboardCircle,color: Colors.white,)),
       centerTitle: true,
       title: Text(
         title,
@@ -26,9 +27,9 @@ class FarmAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       actions: [
         IconButton(onPressed: (){
-          Navigator.pushNamed(context,"userProfile");
+          context.push("/userprofile");
         },
-            icon: const Icon(Icons.person_rounded,color: Colors.white,))
+            icon: const HugeIcon(icon:HugeIcons.strokeRoundedUserCircle,color: Colors.white,))
       ],
     );
   }

@@ -29,6 +29,7 @@ class _FarmHomeState extends State<FarmHome> {
   int _creditVal = 0;
   bool? onCredit = false;
   bool saleActive = false;
+  String? selectFlock = "";
 
   Future<void> refreshData() async{
     setState(() {
@@ -47,6 +48,7 @@ class _FarmHomeState extends State<FarmHome> {
             size: 35,
           ),
           onPressed: () {
+            _flock.text = "$selectFlock";
             setState(() {
               saleActive = true;
             });
@@ -93,8 +95,10 @@ class _FarmHomeState extends State<FarmHome> {
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             itemBuilder: (context, index) {
-                              var values =
-                                  snapshot.data?[index]["${labels[index]}"];
+                              var values = snapshot.data?[index]["${labels[index]}"];
+                              if(index == 3){
+                                selectFlock = values;
+                              }
                               return Container(
                                   margin: const EdgeInsets.only(bottom: 8.0),
                                   child: FarmCard(
@@ -104,19 +108,19 @@ class _FarmHomeState extends State<FarmHome> {
                                   ));
                             });
                       }
-                      return SizedBox();
+                      return const SizedBox();
                     }),
                 Visibility(
+                  visible: saleActive,
                   child: Container(
                       width: double.maxFinite,
                       alignment: Alignment.centerLeft,
-                      margin: EdgeInsets.symmetric(vertical: 10.0),
-                      child: Text(
+                      margin: const EdgeInsets.symmetric(vertical: 10.0),
+                      child: const Text(
                         "Make Sales",
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 17.0),
                       )),
-                  visible: saleActive,
                 ),
                 Visibility(
                     visible: saleActive,
@@ -125,10 +129,7 @@ class _FarmHomeState extends State<FarmHome> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          FarmTextInput(
-                              controller: _flock,
-                              inputLabel: "Flock",
-                              keyboardType: TextInputType.number),
+                          FarmTextInput(readOnly: true,controller: _flock, inputLabel: "Flock", keyboardType: TextInputType.number),
                           FarmTextInput(
                               controller: _weight,
                               inputLabel: "Weight",

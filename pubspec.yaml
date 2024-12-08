@@ -38,6 +38,8 @@ dependencies:
   pinput: ^5.0.0
   sqflite: ^2.4.1
   flutter_native_splash: ^2.4.3
+  go_router: ^14.6.2
+  hugeicons: ^0.0.7
 
 
 dev_dependencies:

@@ -1,5 +1,6 @@
 import 'package:farm_app/components/drawer_item.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class FarmDrawer extends StatelessWidget {
   const FarmDrawer({super.key, this.title, this.version});
@@ -18,12 +19,12 @@ class FarmDrawer extends StatelessWidget {
       "2849830_multimedia_options_setting_settings_gear_icon.png"
     ];
     var routes = [
-      "chicks",
-      "flock",
-      "chicks",
-      "chicks",
-      "chicks",
-      "chicks",
+      "/chicks",
+      "/flock",
+      "/chicks",
+      "/chicks",
+      "/chicks",
+      "/settings",
     ];
 
     return SafeArea(
@@ -54,7 +55,8 @@ class FarmDrawer extends StatelessWidget {
               for(int i=0; i<labels.length; i++)
               GestureDetector(
                 onTap: (){
-                    Navigator.pushNamed(context, routes[i]);
+                    //Navigator.pushNamed(context, routes[i]);
+                  context.push(routes[i]);
                 },
                 child: DrawerItem(image: images[i],label: labels[i],),
               ),

@@ -16,6 +16,9 @@ class _FarmChicksState extends State<FarmChicks> {
   final TextEditingController _qty = TextEditingController();
   final TextEditingController _deaths = TextEditingController();
   final TextEditingController _available = TextEditingController();
+  final TextEditingController _addCompany = TextEditingController();
+  final TextEditingController _addQty = TextEditingController();
+  final TextEditingController _addDeaths = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +49,45 @@ class _FarmChicksState extends State<FarmChicks> {
             size: 35,
           ),
           onPressed: () {
+            showDialog(context: context, 
+                builder: (context){
+              return AlertDialog(
+                backgroundColor: Theme.of(context).primaryColor,
+                title: FittedBox(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("Add new chicks stock"),
+                      IconButton(onPressed: (){Navigator.of(context).pop();}, icon: const Icon(Icons.close,color: Colors.red,))
+                    ],
+                  ),
+                ),
+                titleTextStyle: const TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),
+                content: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      FarmTextInput(controller: _addCompany, inputLabel: "Company", keyboardType: TextInputType.text),
+                      FarmTextInput(controller: _addQty, inputLabel: "Quantity", keyboardType: TextInputType.number),
+                      FarmTextInput(controller: _addDeaths, inputLabel: "Deaths", keyboardType: TextInputType.number),
+                    ],
+                  ),
+                ),
+                actionsAlignment: MainAxisAlignment.center,
+                actions: [
+                  GestureDetector(onTap: (){
+                    _databaseService.addChicksData(_addCompany.text,int.parse(_addDeaths.text), int.parse(_addQty.text));
+                    setState(() {});
+                    Navigator.of(context).pop();
+                    _addCompany.text =  "";
+                    _addDeaths.text = "";
+                    _addQty.text = "";
+                  },child: const FarmButton(buttonLabel: "Save"))
+                ],
+              );
+                }
+            );
           }),
       body: FutureBuilder(
         future: _databaseService.getChicksData(),
@@ -139,7 +181,7 @@ class _FarmChicksState extends State<FarmChicks> {
                                           );
                                         }
                                     );
-                                  }, icon: const Icon(Icons.edit,color: Colors.blue,)),
+                                  }, icon: const Icon(Icons.edit,color: Colors.yellow,)),
                                   IconButton(
                                       onPressed: (){
                                         //Delete chicks record
@@ -148,7 +190,6 @@ class _FarmChicksState extends State<FarmChicks> {
                                         setState(() {
 
                                         });
-
                                   }, icon: const Icon(Icons.close,color: Colors.red,)),
                                 ],
                               )
