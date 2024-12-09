@@ -9,21 +9,17 @@ class FarmDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var labels = ["Chicks","Flock","Sales","Sales Summary","Flock Summary","Settings"];
+    var labels = ["Chicks","Flock","Sales Summary","Settings"];
     var images = [
       "10393933_spring_holiday_vacation_chick_icon.png",
       "6330643_accept_check_list_lists_orders_icon.png",
-      "7581523_order_confirmation_application_check_smartphone_icon.png",
-      "3702389_door sign_label_sale_sign_icon.png",
       "3671721_calendar_icon.png",
       "2849830_multimedia_options_setting_settings_gear_icon.png"
     ];
     var routes = [
       "/chicks",
       "/flock",
-      "/chicks",
-      "/chicks",
-      "/chicks",
+      "/sales",
       "/settings",
     ];
 
@@ -62,7 +58,7 @@ class FarmDrawer extends StatelessWidget {
               ),
               Container(
                   margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),
-                  child: Text("Version: ${version}", style: TextStyle(fontWeight: FontWeight.bold),))
+                  child: Text("Version: ${version}", style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.white),))
             ],
           ),
         ),

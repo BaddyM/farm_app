@@ -2,6 +2,7 @@ import "package:farm_app/components/InputFields.dart";
 import "package:farm_app/components/farm_button.dart";
 import "package:farm_app/models/database_service.dart";
 import "package:flutter/material.dart";
+import "package:go_router/go_router.dart";
 
 class FarmChicks extends StatefulWidget {
   const FarmChicks({super.key});
@@ -30,7 +31,7 @@ class _FarmChicksState extends State<FarmChicks> {
         elevation: 5.0,
         leading: IconButton(
             onPressed: () {
-              Navigator.of(context).pop();
+              context.pop();
             },
             icon: const Icon(
               Icons.arrow_back,

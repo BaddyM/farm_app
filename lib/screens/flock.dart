@@ -31,7 +31,7 @@ class _FarmFlockState extends State<FarmFlock> {
         elevation: 5.0,
         leading: IconButton(
             onPressed: () {
-              context.go("/");
+              context.pop();
             },
             icon: const Icon(
               Icons.arrow_back,

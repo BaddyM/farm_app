@@ -51,13 +51,6 @@ class DatabaseService {
           uploaded INTEGER NOT NULL DEFAULT 0)
         ''';
 
-        final String createSalesHistoryTable = '''
-          CREATE TABLE IF NOT EXISTS $_salesHistoryTable(id INTEGER PRIMARY KEY AUTOINCREMENT, flock TEXT NOT NULL,
-          qty INTEGER NOT NULL, weight REAL NOT NULL, decimal_value REAL NOT NULL, price INTEGER NOT NULL, 
-          date TEXT NOT NULL,on_credit INTEGER NOT NULL DEFAULT 0, paid INTEGER NOT NULL DEFAULT 0, customer_name TEXT,
-          uploaded INTEGER NOT NULL DEFAULT 0)
-        ''';
-
         final String createAppInfoTable = '''
           CREATE TABLE IF NOT EXISTS $_appInfo(id INTEGER PRIMARY KEY AUTOINCREMENT,app_version INTEGER NOT NULL DEFAULT 0,
           app_name TEXT NOT NULL)
@@ -80,7 +73,6 @@ class DatabaseService {
         db.execute(createAppInfoTable);
         db.execute(createSalesTable);
         db.execute(createFlockInfoTable);
-        db.execute(createSalesHistoryTable);
       },
     );
     return database;
@@ -208,7 +200,7 @@ class DatabaseService {
   Future<List> getUserProfile() async {
     final db = await database;
     var userData = await db.rawQuery('''
-      SELECT * FROM user_info;
+      SELECT * FROM user_info LIMIT 1;
     ''');
     return userData;
   }
@@ -221,6 +213,22 @@ class DatabaseService {
   void updateUserProfile(String userName, String pin, String id) async {
     final db = await database;
     await db.update("user_info", {"username":userName,"pin":pin},where: "id = ?", whereArgs: [id]);
+  }
+
+  void logoutUserProfile() async{
+    final db = await database;
+    db.delete(_userInfo);
+    db.rawQuery("DELETE FROM sqlite_sequence WHERE name='${_userInfo}';");
+  }
+  
+  void loginUser() async{
+    final db = await database;
+    db.update(_userInfo, {"active":1});
+  }
+
+  void logoutUserAuth() async{
+    final db = await database;
+    db.update(_userInfo, {"active":0});
   }
 
   //Home summary

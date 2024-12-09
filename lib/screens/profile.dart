@@ -23,6 +23,8 @@ class _UserProfileState extends State<UserProfile> {
 
   @override
   Widget build(BuildContext context) {
+    final DatabaseService _databaseService = DatabaseService.instance;
+
     return Scaffold(
       backgroundColor: Colors.brown[300],
       appBar: AppBar(
@@ -31,7 +33,7 @@ class _UserProfileState extends State<UserProfile> {
         elevation: 5.0,
         leading: IconButton(
             onPressed: () {
-              context.go("/");
+              context.pop();
             },
             icon: const Icon(
               Icons.arrow_back,
@@ -120,11 +122,22 @@ class _UserProfileState extends State<UserProfile> {
                           }
                         },
                         child: const FarmButton(buttonLabel: "Save")),
+                  ),
+                  const SizedBox(height: 20,),
+                  const Divider(),
+                  MaterialButton(
+                    color: Colors.red,
+                    onPressed: (){
+                    _databaseService.logoutUserProfile();
+                    context.go("/login");
+                  },
+                  child: const Text("Logout",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
                   )
+
                 ],
               );
             }
-            return SizedBox();
+            return const SizedBox();
           },
         ),
       ),

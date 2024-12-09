@@ -1,13 +1,27 @@
 import 'dart:ui';
+import "package:go_router/go_router.dart";
+import 'package:farm_app/models/database_service.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 
-class UserLogin extends StatelessWidget {
+class UserLogin extends StatefulWidget {
   final title;
   const UserLogin({super.key, this.title});
 
   @override
+  State<UserLogin> createState() => _UserLoginState();
+}
+
+class _UserLoginState extends State<UserLogin> {
+  final DatabaseService _databaseSerive = DatabaseService.instance;
+  String userPassword = "";
+
   Widget build(BuildContext context) {
+    _databaseSerive.getUserProfile().then((value){
+      if(value.isNotEmpty){
+        userPassword = value[0]["pin"].toString();
+      }
+    });
     return Scaffold(
         body: Container(
       alignment: Alignment.center,
@@ -37,7 +51,7 @@ class UserLogin extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  title,
+                  widget.title,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 50,
@@ -72,7 +86,7 @@ class UserLogin extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   padding: const EdgeInsets.only(left: 5.0),
                   child: Text(
-                      "Please login to access all the features of ${title}"),
+                      "Please login to access all the features of ${widget.title}"),
                 ),
                 Container(
                   padding: const EdgeInsets.only(top: 20.0),
@@ -94,14 +108,24 @@ class UserLogin extends StatelessWidget {
                           borderRadius: BorderRadius.all(Radius.circular(15))),
                     ),
                     obscuringCharacter: "*",
-                    onCompleted: (values) {},
+                    onCompleted: (values) {
+                      if(values.toString() == userPassword){
+                        context.go("/");
+                      }else{
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                backgroundColor: Colors.black87,
+                                content: Text("Sorry, wrong pin!",style: TextStyle(color: Colors.white),)
+                            )
+                        );
+                      }
+                    },
                   ),
                 ),
                 Container(
                   alignment: Alignment.center,
                   width: double.maxFinite,
                   padding: const EdgeInsets.only(top: 10.0),
-                  margin: const EdgeInsets.only(top: 10.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -116,7 +140,9 @@ class UserLogin extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline),
                         ),
-                        onTap: () {},
+                        onTap: () {
+                          context.push("/register");
+                        },
                       ),
                     ],
                   ),

@@ -1,7 +1,9 @@
 import 'package:farm_app/components/InputFields.dart';
 import 'package:farm_app/components/farm_button.dart';
+import 'package:farm_app/models/database_service.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
+import "package:go_router/go_router.dart";
 
 class UserRegistration extends StatefulWidget {
   final title;
@@ -12,6 +14,7 @@ class UserRegistration extends StatefulWidget {
 }
 
 class _UserRegistrationState extends State<UserRegistration> {
+  DatabaseService _databaseService = DatabaseService.instance;
   TextEditingController _farmName = TextEditingController();
   TextEditingController _userName = TextEditingController();
   TextEditingController _phoneNumber = TextEditingController();
@@ -81,18 +84,24 @@ class _UserRegistrationState extends State<UserRegistration> {
                             fontFamily: "roboto-bold",
                           ),
                         )),
-                    FarmTextInput(
-                        controller: _farmName,
-                        inputLabel: "Farm Name",
-                        keyboardType: TextInputType.text),
+                    Visibility(
+                      visible: false,
+                      child: FarmTextInput(
+                          controller: _farmName,
+                          inputLabel: "Farm Name",
+                          keyboardType: TextInputType.text),
+                    ),
                     FarmTextInput(
                         controller: _userName,
                         inputLabel: "UserName",
                         keyboardType: TextInputType.text),
-                    FarmTextInput(
-                        controller: _phoneNumber,
-                        inputLabel: "Phone Number",
-                        keyboardType: TextInputType.number),
+                    Visibility(
+                      visible: false,
+                      child: FarmTextInput(
+                          controller: _phoneNumber,
+                          inputLabel: "Phone Number",
+                          keyboardType: TextInputType.number),
+                    ),
                     Container(
                       width: double.maxFinite,
                       alignment: Alignment.centerLeft,
@@ -155,6 +164,7 @@ class _UserRegistrationState extends State<UserRegistration> {
                                   decoration: TextDecoration.underline),
                             ),
                             onTap: () {
+                              context.pop();
                             },
                           ),
                         ],
@@ -162,7 +172,23 @@ class _UserRegistrationState extends State<UserRegistration> {
                     ),
                     Container(
                         margin: const EdgeInsets.only(top: 10.0),
-                        child: const FarmButton(buttonLabel: "Register"))
+                        child: GestureDetector(
+                          onTap: (){
+                            try{
+                              _databaseService.saveNewUserProfile(_userName.text, _pin);
+                              context.go("/login");
+                            }catch(e){
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      backgroundColor: Colors.black87,
+                                      content: Text("Sorry, something went wrong!",style: TextStyle(color: Colors.white),)
+                                  )
+                              );
+                            }
+                          },
+                            child: const FarmButton(buttonLabel: "Register")
+                        )
+                    )
                   ],
                 ),
               ),

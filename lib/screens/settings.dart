@@ -37,7 +37,7 @@ class _FarmSettingsState extends State<FarmSettings> {
         elevation: 5.0,
         leading: IconButton(
             onPressed: () {
-              context.go("/");
+              context.pop();
             },
             icon: const Icon(
               Icons.arrow_back,
