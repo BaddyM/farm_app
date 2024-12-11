@@ -1,6 +1,3 @@
-import "dart:convert";
-import "dart:math";
-
 import "package:farm_app/components/InputFields.dart";
 import "package:farm_app/components/appbar.dart";
 import "package:farm_app/components/drawer.dart";
@@ -201,8 +198,7 @@ class _FarmHomeState extends State<FarmHome> {
                                     String price = _price.text;
                                     String customerName = _customerName.text;
                                     String paid = _paid.text;
-                                    String date =
-                                        "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}";
+                                    String date = "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}";
 
                                     if (flock.length > 0 &&
                                         weight.length > 0 &&
@@ -220,22 +216,27 @@ class _FarmHomeState extends State<FarmHome> {
                                           _creditVal,
                                           int.parse(paid),
                                           customerName,
-                                          date);
-                                      setState(() {
-                                        saleActive = false;
-                                        onCredit = false;
-                                      });
+                                          date).then((response){
+                                            setState(() {
+                                              saleActive = false;
+                                              onCredit = false;
+                                            });
+                                            //Clear the inputs
+                                            _customerName.text = "";
+                                            _creditVal = 0;
+                                            _decimalValue.text = "";
+                                            _weight.text = "";
+                                            _flock.text = "";
+                                            _price.text = "";
+                                            _paid.text = "";
+                                            _qty.text = "";
+                                            _flock.text = "";
 
-                                      //Clear the inputs
-                                      _customerName.text = "";
-                                      _creditVal = 0;
-                                      _decimalValue.text = "";
-                                      _weight.text = "";
-                                      _flock.text = "";
-                                      _price.text = "";
-                                      _paid.text = "";
-                                      _qty.text = "";
-                                      _flock.text = "";
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(content: Text(response,style: const TextStyle(color: Colors.white),),
+                                                backgroundColor: Colors.black87,)
+                                            );
+                                      });
                                     } else {
                                       showModalBottomSheet(
                                           context: context,

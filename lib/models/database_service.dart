@@ -95,7 +95,7 @@ class DatabaseService {
   //Add Sales Data
   Future<String> addSalesData(
       String flock,
-      int? qty,
+      int qty,
       double? weight,
       double? decimalValue,
       int? price,
@@ -104,22 +104,62 @@ class DatabaseService {
       String customerName,
       String date) async {
     final db = await database;
+    var salesStatus = "";
     final currentFlockValue = await db.query(_flockTable,whereArgs: [flock],where: "flock=?");
-    print("Current Flock Qty: ${currentFlockValue}");
-    /*
-    await db.insert(_salesTable, {
-      "flock": flock,
-      "weight": weight,
-      "decimal_value": decimalValue,
-      "price": price,
-      "on_credit": on_credit,
-      "paid": paid,
-      "customer_name": customerName,
-      "qty": qty,
-      "date": date
-    });
-    */
-    return "";
+    if(currentFlockValue.isNotEmpty){
+      if(int.parse(currentFlockValue[0]["qty"].toString()) >= qty){
+        int newQty = (int.parse(currentFlockValue[0]["qty"].toString()) - qty);
+        //Insert new sales
+        await db.insert(_salesTable, {
+          "flock": flock,
+          "weight": weight,
+          "decimal_value": decimalValue,
+          "price": price,
+          "on_credit": on_credit,
+          "paid": paid,
+          "customer_name": customerName,
+          "qty": qty,
+          "date": date
+        });
+
+        //Update the flock table
+        await db.update(_flockTable,{
+          "qty":newQty,
+        },
+          where: "flock=?",
+          whereArgs: [flock]
+        );
+        salesStatus = "Sales made successfully";
+      }else{
+        salesStatus = "Sales failed";
+      }
+    }
+    return salesStatus;
+  }
+
+  Future<String> payCredit(int id, int amount) async{
+    final _db = await database;
+    String response = "";
+    var salesData = await _db.query(_salesTable,where: "id=?",whereArgs: [id]);
+    var totalAmount = (double.parse(salesData[0]["weight"].toString()) * double.parse(salesData[0]["decimal_value"].toString()) *
+        int.parse(salesData[0]["price"].toString()));
+    var balance = (totalAmount - int.parse(salesData[0]["paid"].toString()));
+    var oldPaid = int.parse(salesData[0]["paid"].toString());
+    var newPaid = (oldPaid + amount);
+    print("NewPaid: ${newPaid}, Total: ${totalAmount}");
+    if(newPaid <= totalAmount){
+      //update the table
+      await _db.update(_salesTable,{
+        "paid":newPaid
+      },
+        whereArgs: [id],
+        where: "id=?"
+      );
+      response = "Credit paid successfully";
+    }else{
+      response = "Amount entered is too high";
+    }
+    return response;
   }
 
   //Flock Data
@@ -241,7 +281,7 @@ class DatabaseService {
       SELECT SUM(paid) as today_sales FROM chicken_sales WHERE date = "$today";
     ''');
     var totalChicken = await db.rawQuery('''
-      SELECT SUM(available) as available FROM chicken_flock;
+      SELECT SUM(qty) as available FROM chicken_flock;
     ''');
     var brooderChicks = await db.rawQuery('''
       SELECT  SUM(available) as brooder_counter FROM chicks_entry_stock WHERE brooder = 1;
@@ -256,6 +296,14 @@ class DatabaseService {
     var db = await database;
     var recentTransactions = await db.rawQuery('''
       SELECT * FROM chicken_sales ORDER BY id DESC LIMIT 10;
+    ''');
+    return recentTransactions;
+  }
+
+  Future<List> allSales() async {
+    var db = await database;
+    var recentTransactions = await db.rawQuery('''
+      SELECT * FROM chicken_sales ORDER BY id DESC;
     ''');
     return recentTransactions;
   }

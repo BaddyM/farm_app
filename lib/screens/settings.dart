@@ -37,7 +37,7 @@ class _FarmSettingsState extends State<FarmSettings> {
         elevation: 5.0,
         leading: IconButton(
             onPressed: () {
-              context.pop();
+              context.go("/");
             },
             icon: const Icon(
               Icons.arrow_back,
@@ -445,7 +445,7 @@ class _FarmSettingsState extends State<FarmSettings> {
                                                       .updateFlockLabel(
                                                           data["id"]);
                                                   setState(() {});
-                                                  context.pop();
+                                                  context.go("/");
                                                 },
                                                 icon: const Icon(
                                                   Icons.check,

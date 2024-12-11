@@ -3,6 +3,7 @@ import "package:go_router/go_router.dart";
 import 'package:farm_app/models/database_service.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
+import "package:local_auth/local_auth.dart";
 
 class UserLogin extends StatefulWidget {
   final title;
@@ -14,7 +15,9 @@ class UserLogin extends StatefulWidget {
 
 class _UserLoginState extends State<UserLogin> {
   final DatabaseService _databaseSerive = DatabaseService.instance;
+  final LocalAuthentication _localAuthentication = LocalAuthentication();
   String userPassword = "";
+  bool isAuthenticated = false;
 
   Widget build(BuildContext context) {
     _databaseSerive.getUserProfile().then((value){
@@ -111,6 +114,7 @@ class _UserLoginState extends State<UserLogin> {
                     onCompleted: (values) {
                       if(values.toString() == userPassword){
                         context.go("/");
+                        _databaseSerive.loginUser();
                       }else{
                         ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -146,6 +150,32 @@ class _UserLoginState extends State<UserLogin> {
                       ),
                     ],
                   ),
+                ),
+                SizedBox(height: 10,),
+                MaterialButton(
+                  onPressed: () async{
+                    try{
+                      bool checkBiometrics = await _localAuthentication.canCheckBiometrics;
+                      if(checkBiometrics){
+                        bool didAuthenticate = await _localAuthentication.authenticate(
+                            localizedReason: "Please enter finger print to gain access",
+                            options: AuthenticationOptions(
+                                biometricOnly: false
+                            )
+                        );
+                        if(didAuthenticate){
+                          context.go("/");
+                        }
+                      }
+                    }catch(e){
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(backgroundColor: Colors.black87,content: Text("Sorry,Something went wrong",style:
+                        TextStyle(color: Colors.white),))
+                      );
+                    }
+                },
+                  color: Colors.yellow,
+                  child: Text("Use Fingerprint",style: TextStyle(fontWeight: FontWeight.bold),),
                 )
               ],
             ),

@@ -51,8 +51,8 @@ class FarmDrawer extends StatelessWidget {
               for(int i=0; i<labels.length; i++)
               GestureDetector(
                 onTap: (){
-                    //Navigator.pushNamed(context, routes[i]);
-                  context.push(routes[i]);
+                  context.pop(context);
+                  context.go(routes[i]);
                 },
                 child: DrawerItem(image: images[i],label: labels[i],),
               ),

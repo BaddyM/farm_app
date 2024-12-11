@@ -31,7 +31,7 @@ class _FarmChicksState extends State<FarmChicks> {
         elevation: 5.0,
         leading: IconButton(
             onPressed: () {
-              context.pop();
+              context.go("/");
             },
             icon: const Icon(
               Icons.arrow_back,
@@ -174,7 +174,7 @@ class _FarmChicksState extends State<FarmChicks> {
                                                   _databaseService.updateChicksData(company, int.parse(qty),
                                                       int.parse(deaths), int.parse(available), id);
                                                   Navigator.of(context).pop();
-                                                  setState(() {});
+                                                  setState((){});
                                                 },
                                                 child: const FarmButton(buttonLabel: "Save"),
                                               )

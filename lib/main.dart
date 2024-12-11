@@ -12,77 +12,98 @@ import 'package:flutter/services.dart';
 import "package:go_router/go_router.dart";
 
 void main(){
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget with WidgetsBindingObserver{
-  MyApp({super.key});
-  var title = "My Farm";
-  var version = "1.0.0";
-  var userActive = "";
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  static const title = "Chicken Farm";
+  static const version = "1.0.0";
+  var userActive = "0";
   final DatabaseService _databaseService = DatabaseService.instance;
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state){
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    if(state == AppLifecycleState.inactive || state == AppLifecycleState.detached){
+    if (state == AppLifecycleState.inactive) {
       _databaseService.logoutUserAuth();
+      userActive = "0";
+    } else if (state == AppLifecycleState.paused) {
+    } else if (state == AppLifecycleState.resumed) {
+      userActive = "0";
     }
   }
 
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    _databaseService.getUserProfile().then((onValue){
-      if(onValue.isNotEmpty){
+    _databaseService.getUserProfile().then((onValue) {
+      if (onValue.isNotEmpty) {
         int active = onValue[0]["active"];
-        userActive = active.toString();
-      }else{
+        userActive = active.toString() == "" ? "0" : active.toString();
+      } else {
         //User not existing
         userActive = 0.toString();
       }
-      });
-    final routes = GoRouter(
-        initialLocation: userActive != "0"?"/":"/login",
+    });
+
+    final routes =
+    GoRouter(
+        //initialLocation: userActive == "0" ? "/login" : "/",
+        initialLocation: "/sales",
         routes: [
-          GoRoute(
-            path: "/",
-            builder: (context,state)=> FarmHome(title:title, version: version,),
-          ),
-          GoRoute(
-              path: "/settings",
-              builder: (context,state)=> const FarmSettings()
-          ),
-          GoRoute(
-              path: "/flock",
-              builder: (context,state)=> const FarmFlock()
-          ),
-          GoRoute(
-              path: "/userprofile",
-              builder: (context,state)=> const UserProfile()
-          ),
-          GoRoute(
-              path: "/chicks",
-              builder: (context,state)=> const FarmChicks()
-          ),
-          GoRoute(
-              path: "/sales",
-              builder: (context,state)=> const FarmSalesSummary()
-          ),
-          GoRoute(
-              path: "/login",
-              builder: (context,state)=> UserLogin(title: title,)
-          ),
-          GoRoute(
-              path: "/register",
-              builder: (context,state)=> UserRegistration(title: title,)
-          )
-        ]
-    );
+      GoRoute(
+        path: "/",
+        builder: (context, state) => const FarmHome(
+          title: title,
+          version: version,
+        ),
+      ),
+      GoRoute(
+          path: "/settings", builder: (context, state) => const FarmSettings()),
+      GoRoute(path: "/flock", builder: (context, state) => const FarmFlock()),
+      GoRoute(
+          path: "/userprofile",
+          builder: (context, state) => const UserProfile()),
+      GoRoute(path: "/chicks", builder: (context, state) => const FarmChicks()),
+      GoRoute(
+          path: "/sales",
+          builder: (context, state) => const FarmSalesSummary()),
+      GoRoute(
+          path: "/login",
+          builder: (context, state) => const UserLogin(
+                title: title,
+              )),
+      GoRoute(
+          path: "/register",
+          builder: (context, state) => const UserRegistration(
+                title: title,
+              ))
+    ]);
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
